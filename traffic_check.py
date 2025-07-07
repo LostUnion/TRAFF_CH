@@ -1,5 +1,6 @@
 import argparse
 from abc import ABC
+from urllib.parse import urlparse
 
 from curl_cffi import Session
 
@@ -25,17 +26,46 @@ class TRAFFIC_CHECKER(CONFIG):
     def __init__(self, site_name: str):
         super().__init__()
         self.site_name = site_name
+        self.check_format_link()
+
+    def check_format_link(self):
+        try:
+            url = self.site_name
+
+            if not url.startswith("http://") and not url.startswith("https://"):
+                url = "http://" + url
+
+            parsed = urlparse(url)
+
+            self.site_name = parsed.netloc
+
+            if ':' in self.site_name:
+                self.site_name = self.site_name.split(':')[0]
+
+
+        except Exception as err:
+            print(f"An error occurred in the block TRAFFIC_CHECKER.check_format_link: {err}")
+            return False
 
     def get_traffic(self):
         try:
             full_url = f"https://www.similarsites.com/api/site/{self.site_name}"
-            print(full_url)
             res = self.session.get(url=full_url, headers=self.headers)
-            print(res.content)
-
+            res_json = res.json()
+            if res_json is None:
+                print('This site is not in the database!')
+                return False
+            
+            total_visits = res_json['TotalVisits']
+            return total_visits
         except Exception as err:
             print(f"An error occurred in the block TRAFFIC_CHECKER.get_traffic: {err}")
             return False
-        
-check = TRAFFIC_CHECKER('ebay.com')
-check.get_traffic()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Checking the monthly traffic on the site.')
+    parser.add_argument('-s', '--site_name', type=str, required=True, help='asdasd')
+    args = parser.parse_args()
+
+    check = TRAFFIC_CHECKER(args.site_name)
+    print(check.get_traffic())
