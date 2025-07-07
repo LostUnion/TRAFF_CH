@@ -30,7 +30,7 @@ class TRAFFIC_CHECKER(CONFIG):
 
     def check_format_link(self):
         try:
-            url = self.site_name
+            url = self.site_name.lower()
 
             if not url.startswith("http://") and not url.startswith("https://"):
                 url = "http://" + url
