@@ -64,7 +64,7 @@ class TRAFFIC_CHECKER(CONFIG):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Checking the monthly traffic on the site.')
-    parser.add_argument('-s', '--site_name', type=str, required=True, help='asdasd')
+    parser.add_argument('-s', '--site_name', type=str, required=True, help='Enter site-name')
     args = parser.parse_args()
 
     check = TRAFFIC_CHECKER(args.site_name)
